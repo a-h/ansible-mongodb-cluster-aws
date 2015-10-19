@@ -18,6 +18,6 @@ port = {{ mongos_port }}
  {% endfor %}
 
 # location of pidfile
-pidfilepath = /var/run/mongodb/mongos.pid
+pidfilepath = /var/run/mongo/mongos.pid
 keyFile={{ mongodb_datadir_prefix }}/secret
 chunkSize={{ mongos_chunk_size }}

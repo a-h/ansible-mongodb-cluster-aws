@@ -6,7 +6,7 @@ After=syslog.target network.target
 Type=forking
 User=mongod
 Group=mongod
-PIDFile=/var/run/mongodb/mongod.pid
+PIDFile=/var/run/mongo/mongod.pid
 EnvironmentFile=/etc/sysconfig/mongod
 ExecStart=/bin/mongod $OPTIONS run
 
