@@ -42,7 +42,11 @@
 - name: Initialize the replication set
   shell: /usr/bin/mongo --port "{{ mongod_port }}" /tmp/repset_init.js
 
-# Now setup replication.
+- name: Add the admin user to the replicaset
+  mongodb_user: database=admin name=admin password={{ mongo_admin_pass }} replica_set={{ replica_set_name }} login_port={{ mongod_port }} roles='root' state=present
+  ignore_errors: yes
+
+# Secure replication
 - name: Copy the keyfile for replicated authentication
   copy: src=secret dest={{ mongodb_datadir_prefix }}secret owner=mongod group=mongod mode=0400
 
@@ -51,10 +55,3 @@
 
 - name: Restart mongodb
   service: name=mongod.service enabled=yes state=restarted
-
-- name: Initialize the replication set
-  shell: /usr/bin/mongo --port "{{ mongod_port }}" /tmp/repset_init.js
-
-- name: Add the admin user
-  mongodb_user: database=admin name=admin password={{ mongo_admin_pass }} replica_set={{ replica_set_name }} login_port={{ mongod_port }} roles='readWrite,dbAdmin,userAdmin' state=present
-  ignore_errors: yes
