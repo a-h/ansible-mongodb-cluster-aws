@@ -1,27 +1,9 @@
-##Deploying a sharded, production-ready MongoDB cluster with Ansible
-------------------------------------------------------------------------------
+##Deploying a MongoDB cluster with Ansible
 
-- Requires Ansible 1.2
-- Expects CentOS/RHEL 6 hosts
+- Tested with Ansible 1.9.4
+- Expects CentOS/RHEL 7 hosts
 
-### A Primer
----------------------------------------------
-
-![Alt text](images/nosql_primer.png "Primer NoSQL")
-
-The above diagram shows how MongoDB differs from the traditional relational
-database model. In an RDBMS, the data associated with 'user' is stored in a
-table, and the records of users are stored in rows and columns. In MongoDB, the
-'table' is replaced by a 'collection' and the individual 'records' are called
-'documents'.  One thing to notice is that the data is stored as key/value pairs
-in BJSON format.
-
-Another thing to notice is that NoSQL-style databases have a looser consistency
-model. As an example, the second document in the users collection has an
-additonal field of 'last name'.
- 
 ### Data Replication
-------------------------------------
 
 ![Alt text](images/replica_set.png "Replica Set")
 
@@ -29,37 +11,30 @@ Data backup is achieved in MongoDB via _replica sets_. As the figure above shows
 a single replication set consists of a replication master (active) and several
 other replications slaves (passive). All the database operations like
 add/delete/update happen on the replication master and the master replicates
-the data to the slave nodes. _mongod_ is the process which is resposible for all
+the data to the slave nodes. _mongod_ is the process which is responsible for all
 the database activities as well as replication processes. The minimum
 recommended number of slave servers are 3.
 
 ### Deploying MongoDB Ansible
---------------------------------------------
 
-#### Deploy the Cluster
-----------------------------
-
-![Alt text](images/site.png "Site")
-  
-The diagram above illustrates the deployment model for a MongoDB cluster deployed by
-Ansible. This deployment model focuses on deploying three shard servers,
-each having a replica set, with the backup replica servers serving as the other two shard
-primaries. The configuration servers are co-located with the shards. The _mongos_
-servers are best deployed on seperate servers. This is the minimum recomended
-configuration for a production-grade MongoDB deployment. Please note that the
-playbooks are capable of deploying N node clusters, not limited to three. Also,
-all the processes are secured using keyfiles.
-
-#### Prerequisite
+#### Prerequisites
 
 Edit the group_vars/all file to reflect the below variables.
 
-1) iface: 'eth1'     # the interface to be used for all communication.
-		
-2) Set a mongod_port variable in the inventory file for each MongoDB
-server.
+- Use the provided Vagrant file with VirtualBox to create servers to host the
+cluster and edit your hosts file to include your new servers, e.g.:
 
-3) The default directory for storing data is /data, please do change it if
+        10.0.0.101      mongo1
+        10.0.0.102      mongo2
+        10.0.0.103      mongo3
+
+- If you decide to use some other virtual machines, update the name of the
+ethernet adaptor (iface variable) in the /group_vars/all file and ensure that
+ports 22 and 27017 are accessible.
+
+    enp0s8     # the interface to be used for all communication.
+
+- The default directory for storing data is /data, please change it if
 required. Make sure it has sufficient space: 10G is recommended.
 
 ### Deployment Example
@@ -68,9 +43,9 @@ The inventory file looks as follows:
 
 		#The site wide list of mongodb servers
 		[mongo_servers]
-		mongo1 mongod_port=2700
-		mongo2 mongod_port=2701
-		mongo3 mongod_port=2702
+		mongo1 mongod_port=27017
+		mongo2 mongod_port=27017
+		mongo3 mongod_port=27017
 
 		#The list of servers where replication should happen, including the master server.
 		[replication_servers]
@@ -80,66 +55,85 @@ The inventory file looks as follows:
 
 Build the site with the following command:
 
-		ansible-playbook -i hosts site.yml -u root -k
+    ansible-playbook -i hosts site.yml -u root -k
 
-
-#### Verifying the Deployment 
----------------------------------------------
+#### Verifying the Deployment
 
 Once configuration and deployment has completed we can check replication set
-availability by connecting to individual primary replication set nodes, `mongo
---host 192.168.1.1 --port 2700` and issue the command to query the status of
-replication set, we should get a similar output.
+availability by connecting to individual primary replication set nodes:
 
-		
-		web2:PRIMARY> rs.status()
-		{
-			"set" : "web2",
-			"date" : ISODate("2013-03-19T10:26:35Z"),
-			"myState" : 1,
-			"members" : [
-			{
-				"_id" : 0,
-				"name" : "web2:2013",
-				"health" : 1,
-				"state" : 1,
-				"stateStr" : "PRIMARY",
-				"uptime" : 102,
-				"optime" : Timestamp(1363688755000, 1),
-				"optimeDate" : ISODate("2013-03-19T10:25:55Z"),
-				"self" : true
-			},
-			{
-				"_id" : 1,
-				"name" : "web3:2013",
-				"health" : 1,
-				"state" : 2,
-				"stateStr" : "SECONDARY",
-				"uptime" : 40,
-				"optime" : Timestamp(1363688755000, 1),
-				"optimeDate" : ISODate("2013-03-19T10:25:55Z"),
-				"lastHeartbeat" : ISODate("2013-03-19T10:26:33Z"),
-				"pingMs" : 1
-			}
-			],
-			"ok" : 1
-		}
+        mongo --host mongo1 --port 27017
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------
- 
+When connected, issue the following commands to query the status of the
+replication set and you should get a similar output.
+
+        use admin
+
+        db.auth("admin", "123456")
+
+        rs.status()
+        {
+        	"set" : "mongo_replication",
+        	"date" : ISODate("2015-10-20T13:44:56.390Z"),
+        	"myState" : 1,
+        	"members" : [
+        		{
+        			"_id" : 0,
+        			"name" : "mongo1:27017",
+        			"health" : 1,
+        			"state" : 1,
+        			"stateStr" : "PRIMARY",
+        			"uptime" : 51,
+        			"optime" : Timestamp(1445267208, 2),
+        			"optimeDate" : ISODate("2015-10-19T15:06:48Z"),
+        			"electionTime" : Timestamp(1445348647, 1),
+        			"electionDate" : ISODate("2015-10-20T13:44:07Z"),
+        			"configVersion" : 1,
+        			"self" : true
+        		},
+        		{
+        			"_id" : 1,
+        			"name" : "mongo2:27017",
+        			"health" : 1,
+        			"state" : 2,
+        			"stateStr" : "SECONDARY",
+        			"uptime" : 34,
+        			"optime" : Timestamp(1445267208, 2),
+        			"optimeDate" : ISODate("2015-10-19T15:06:48Z"),
+        			"lastHeartbeat" : ISODate("2015-10-20T13:44:55.949Z"),
+        			"lastHeartbeatRecv" : ISODate("2015-10-20T13:44:54.658Z"),
+        			"pingMs" : 1,
+        			"configVersion" : 1
+        		},
+        		{
+        			"_id" : 2,
+        			"name" : "mongo3:27017",
+        			"health" : 1,
+        			"state" : 2,
+        			"stateStr" : "SECONDARY",
+        			"uptime" : 50,
+        			"optime" : Timestamp(1445267208, 2),
+        			"optimeDate" : ISODate("2015-10-19T15:06:48Z"),
+        			"lastHeartbeat" : ISODate("2015-10-20T13:44:55.933Z"),
+        			"lastHeartbeatRecv" : ISODate("2015-10-20T13:44:55.129Z"),
+        			"pingMs" : 0,
+        			"configVersion" : 1
+        		}
+        	],
+        	"ok" : 1
+        }
+
 ### Scaling the Cluster
 ---------------------------------------
-
-![Alt text](images/scale.png "scale")
 
 To add a new node to the existing MongoDB Cluster, modify the inventory file as follows:
 
 		#The site wide list of mongodb servers
 		[mongoservers]
-		mongo1 mongod_port=2700
-		mongo2 mongod_port=2701
-		mongo3 mongod_port=2702
-		mongo4 mongod_port=2703
+		mongo1 mongod_port=27017
+		mongo2 mongod_port=27017
+		mongo3 mongod_port=27017
+		mongo4 mongod_port=27017
 
 		#The list of servers where replication should happen, make sure the new node is listed here.
 		[replicationservers]
@@ -151,14 +145,21 @@ To add a new node to the existing MongoDB Cluster, modify the inventory file as 
 Make sure you have the new node added in the _replicationservers_ section and
 execute the following command:
 
-		ansible-playbook -i hosts site.yml
-    
-###Serverspec.
------------------------------
+    ansible-playbook -i hosts site.yml
+
+###Verification
+
+The newly added node can be easily verified by checking the replication status
+and seeing the data being copied to the newly added node.
+
+###Serverspec
 
 Verify the servers using serverspec with ansible_spec
-$gem install ansible_spec
-$rake T
-rake serverspec:common
-rake serverspec:mongod
-$rake serverspec:mongod
+
+      $gem install ansible_spec
+      $rake T
+      rake serverspec:common
+      rake serverspec:mongod
+      rake serverspec:mongos
+      rake serverspec:shards
+      $rake serverspec:mongod
