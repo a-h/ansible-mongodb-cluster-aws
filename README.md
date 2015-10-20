@@ -1,6 +1,6 @@
 ##Deploying a MongoDB cluster with Ansible
 
-- Requires Ansible 1.2
+- Tested with Ansible 1.9.4
 - Expects CentOS/RHEL 7 hosts
 
 ### Data Replication
@@ -23,9 +23,10 @@ Edit the group_vars/all file to reflect the below variables.
 
 - Use the provided Vagrant file with VirtualBox to create servers to host the
 cluster and edit your hosts file to include your new servers, e.g.:
-    10.0.0.101      mongo1
-    10.0.0.102      mongo2
-    10.0.0.103      mongo3
+
+        10.0.0.101      mongo1
+        10.0.0.102      mongo2
+        10.0.0.103      mongo3
 
 - If you decide to use some other virtual machines, update the name of the
 ethernet adaptor (iface variable) in the /group_vars/all file and ensure that
@@ -54,14 +55,14 @@ The inventory file looks as follows:
 
 Build the site with the following command:
 
-		ansible-playbook -i hosts site.yml -u root -k
+    ansible-playbook -i hosts site.yml -u root -k
 
 #### Verifying the Deployment
 
 Once configuration and deployment has completed we can check replication set
 availability by connecting to individual primary replication set nodes:
 
-`mongo --host mongo1 --port 27017`
+        mongo --host mongo1 --port 27017
 
 When connected, issue the following commands to query the status of the
 replication set and you should get a similar output.
@@ -144,7 +145,7 @@ To add a new node to the existing MongoDB Cluster, modify the inventory file as 
 Make sure you have the new node added in the _replicationservers_ section and
 execute the following command:
 
-		ansible-playbook -i hosts site.yml
+    ansible-playbook -i hosts site.yml
 
 ###Verification
 
@@ -155,10 +156,10 @@ and seeing the data being copied to the newly added node.
 
 Verify the servers using serverspec with ansible_spec
 
-    $gem install ansible_spec
-    $rake T
-    rake serverspec:common
-    rake serverspec:mongod
-    rake serverspec:mongos
-    rake serverspec:shards
-    $rake serverspec:mongod
+      $gem install ansible_spec
+      $rake T
+      rake serverspec:common
+      rake serverspec:mongod
+      rake serverspec:mongos
+      rake serverspec:shards
+      $rake serverspec:mongod
