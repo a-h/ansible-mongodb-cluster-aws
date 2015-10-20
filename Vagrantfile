@@ -31,6 +31,7 @@ Vagrant.configure(2) do |config|
     server.vm.hostname = "mongo3"
   end
 
+  config.vm.provision :shell, inline: "systemctl enable firewalld"
   config.vm.provision :shell, inline: "systemctl start firewalld"
 
   config.vm.provider "virtualbox" do |v|
