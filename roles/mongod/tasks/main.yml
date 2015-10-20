@@ -32,9 +32,6 @@
   command: systemctl --system daemon-reload
   command: systemctl enable mongod.service
 
-#- name: Start the mongodb service
-#  command: systemctl start mongod.service
-
 - name: Enable at boot and start mongodb
   service: name=mongod.service enabled=yes state=started
 
@@ -45,10 +42,6 @@
 - name: Initialize the replication set
   shell: /usr/bin/mongo --port "{{ mongod_port }}" /tmp/repset_init.js
 
-- name: add the admin user
-  mongodb_user: database=admin name=admin password={{ mongo_admin_pass }} login_port={{ mongod_port }} roles='readWrite,dbAdmin,userAdmin' state=present
-  ignore_errors: yes
-
 # Now setup replication.
 - name: Copy the keyfile for replicated authentication
   copy: src=secret dest={{ mongodb_datadir_prefix }}secret owner=mongod group=mongod mode=0400
@@ -56,8 +49,12 @@
 - name: Create the authenticated mongodb configuration file
   template: src=mongod.conf.j2 dest=/etc/mongod.conf
 
-#- name: Start the mongodb service
-#  command: systemctl restart mongod.service
-
 - name: Restart mongodb
   service: name=mongod.service enabled=yes state=restarted
+
+- name: Initialize the replication set
+  shell: /usr/bin/mongo --port "{{ mongod_port }}" /tmp/repset_init.js
+
+- name: Add the admin user
+  mongodb_user: database=admin name=admin password={{ mongo_admin_pass }} replica_set={{ replica_set_name }} login_port={{ mongod_port }} roles='readWrite,dbAdmin,userAdmin' state=present
+  ignore_errors: yes
