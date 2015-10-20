@@ -7,6 +7,7 @@
 # you're doing.
 Vagrant.configure(2) do |config|
   config.vm.box = "bento/centos-7.1"
+  config.ssh.insert_key = false
     
   # Primary data centre
   config.vm.define "mongo_dc1_1" do |server|

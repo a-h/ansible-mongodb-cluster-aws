@@ -121,7 +121,7 @@ The inventory file looks as follows:
 
 Build the site with the following command:
 
-		ansible-playbook -i hosts site.yml
+		ansible-playbook -i hosts site.yml -u root -k
 
 
 #### Verifying the Deployment 
@@ -286,5 +286,15 @@ seeing the chunks being rebalanced to the newly added node.
 				web3	6
 				web2	6
 				bensible	5
-
     
+###Serverspec.
+-----------------------------
+
+Verify the servers using serverspec with ansible_spec
+$gem install ansible_spec
+$rake T
+rake serverspec:common
+rake serverspec:mongod
+rake serverspec:mongos
+rake serverspec:shards
+$rake serverspec:mongod
