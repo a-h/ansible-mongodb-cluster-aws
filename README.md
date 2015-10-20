@@ -1,12 +1,9 @@
 ##Deploying a MongoDB cluster with Ansible
-------------------------------------------------------------------------------
 
 - Requires Ansible 1.2
 - Expects CentOS/RHEL 7 hosts
 
-
 ### Data Replication
-------------------------------------
 
 ![Alt text](images/replica_set.png "Replica Set")
 
@@ -19,7 +16,6 @@ the database activities as well as replication processes. The minimum
 recommended number of slave servers are 3.
 
 ### Deploying MongoDB Ansible
---------------------------------------------
 
 #### Prerequisites
 
@@ -27,15 +23,15 @@ Edit the group_vars/all file to reflect the below variables.
 
 - Use the provided Vagrant file with VirtualBox to create servers to host the
 cluster and edit your hosts file to include your new servers, e.g.:
-  10.0.0.101      mongo1
-  10.0.0.102      mongo2
-  10.0.0.103      mongo3
+    10.0.0.101      mongo1
+    10.0.0.102      mongo2
+    10.0.0.103      mongo3
 
 - If you decide to use some other virtual machines, update the name of the
 ethernet adaptor (iface variable) in the /group_vars/all file and ensure that
 ports 22 and 27017 are accessible.
 
-- iface: enp0s8     # the interface to be used for all communication.
+    enp0s8     # the interface to be used for all communication.
 
 - The default directory for storing data is /data, please change it if
 required. Make sure it has sufficient space: 10G is recommended.
@@ -60,9 +56,7 @@ Build the site with the following command:
 
 		ansible-playbook -i hosts site.yml -u root -k
 
-
 #### Verifying the Deployment
----------------------------------------------
 
 Once configuration and deployment has completed we can check replication set
 availability by connecting to individual primary replication set nodes:
@@ -73,7 +67,9 @@ When connected, issue the following commands to query the status of the
 replication set and you should get a similar output.
 
         use admin
+
         db.auth("admin", "123456")
+
         rs.status()
         {
         	"set" : "mongo_replication",
@@ -150,20 +146,19 @@ execute the following command:
 
 		ansible-playbook -i hosts site.yml
 
-###Verification.
------------------------------
+###Verification
 
-The newly added node can be easily verified by checking the sharding status and
-seeing the chunks being rebalanced to the newly added node.
+The newly added node can be easily verified by checking the replication status
+and seeing the data being copied to the newly added node.
 
-###Serverspec.
------------------------------
+###Serverspec
 
 Verify the servers using serverspec with ansible_spec
-$gem install ansible_spec
-$rake T
-rake serverspec:common
-rake serverspec:mongod
-rake serverspec:mongos
-rake serverspec:shards
-$rake serverspec:mongod
+
+    $gem install ansible_spec
+    $rake T
+    rake serverspec:common
+    rake serverspec:mongod
+    rake serverspec:mongos
+    rake serverspec:shards
+    $rake serverspec:mongod
