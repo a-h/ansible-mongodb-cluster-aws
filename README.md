@@ -33,36 +33,6 @@ the data to the slave nodes. _mongod_ is the process which is resposible for all
 the database activities as well as replication processes. The minimum
 recommended number of slave servers are 3.
 
-### Sharding (Horizontal Scaling) .
-------------------------------------------------
-
-![Alt text](images/sharding.png "Sharding")
-
-Sharding works by partitioning the data into seperate chunks and allocating
-diffent ranges of chunks to diffrent shard servers. The figure above shows a
-collection which has 90 documents which have been sharded across the three
-servers: the first shard getting ranges from 1-29, and so on. When a client wants
-to access a certain document, it contacts the query router (mongos process),
-which in turn contacts the 'configuration node', a lightweight mongod
-process) that keeps a record of which ranges of chunks are distributed across
-which shards. 
-
-Please do note that every shard server should be backed by a replica set, so
-that when data is written/queried copies of the data are available. So in a
-three-shard deployment we would require 3 replica sets and primaries of each
-would act as the sharding server.
-
-Here are the basic steps of how sharding works:
-
-1) A new database is created, and collections are added.
-
-2) New documents get updated when clients update, and all the new documents
-goes into a single shard.
-
-3) When the size of collection in a shard exceeds the 'chunk_size' the
-collection is split and balanced across shards.
-
-
 ### Deploying MongoDB Ansible
 --------------------------------------------
 
@@ -107,17 +77,6 @@ The inventory file looks as follows:
 		mongo3
 		mongo1
 		mongo2
-
-		#The list of mongodb configuration servers, make sure it is 1 or 3
-		[mongoc_servers]
-		mongo1
-		mongo2
-		mongo3
-
-		#The list of servers where mongos servers would run. 
-		[mongos_servers]
-		mongos1
-		mongos2
 
 Build the site with the following command:
 
@@ -166,63 +125,7 @@ replication set, we should get a similar output.
 			"ok" : 1
 		}
 
-
-We can check the status of the shards as follows: connect to the mongos service
-'mongo localhost:8888/admin -u admin -p 123456' and issue the following command to get
-the status of the Shards:
-
-
-		 
-		mongos> sh.status()
-		--- Sharding Status --- 
-		  sharding version: { "_id" : 1, "version" : 3 }
-		  shards:
-			{  "_id" : "web2",  "host" : "web2/web2:2013,web3:2013" }
-			{  "_id" : "web3",  "host" : "web3/web2:2014,web3:2014" }
-  		databases:
-			{  "_id" : "admin",  "partitioned" : false,  "primary" : "config" }
-
-
-We can also make sure the sharding works by creating a database, a collection,
-and populate it with documents and check if the chunks of the collection are
-balanced equally across nodes. The below diagram illustrates the verification
-step.
-
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-![Alt text](images/check.png "check")
-
-The above mentioned steps can be tested with an automated playbook.
-
-Issue the following command to run the test. Pass one of the _mongos_ servers
-in the _servername_ variable.
-		
-		ansible-playbook -i hosts playbooks/testsharding.yml -e servername=server1
-
-
-Once the playbook completes, we check if the sharding has succeeded by logging
-on to any mongos server and issuing the following command. The output displays
-the number of chunks spread across the shards.
-
-		mongos> sh.status()
-			--- Sharding Status --- 
-  			sharding version: { "_id" : 1, "version" : 3 }
-  			shards:
-			{  "_id" : "bensible",  "host" : "bensible/bensible:20103,web2:20103,web3:20103" }
-			{  "_id" : "web2",  "host" : "web2/bensible:20105,web2:20105,web3:20105" }
-			{  "_id" : "web3",  "host" : "web3/bensible:20102,web2:20102,web3:20102" }
-  			databases:
-			{  "_id" : "admin",  "partitioned" : false,  "primary" : "config" }
-			{  "_id" : "test",  "partitioned" : true,  "primary" : "web3" }
-			
-				test.test_collection chunks:
-				
-				bensible	7
-				web2	6
-				web3	7
-			
-			
-
  
 ### Scaling the Cluster
 ---------------------------------------
@@ -245,47 +148,10 @@ To add a new node to the existing MongoDB Cluster, modify the inventory file as 
 		mongo1
 		mongo2
 
-		#The list of mongodb configuration servers, make sure it is 1 or 3
-		[mongoc_servers]
-		mongo1
-		mongo2
-		mongo3
-
-		#The list of servers where mongos servers would run. 
-		[mongos_servers]
-		mongos1
-		mongos2
-
 Make sure you have the new node added in the _replicationservers_ section and
 execute the following command:
 
 		ansible-playbook -i hosts site.yml
-
-###Verification.
------------------------------
-
-The newly added node can be easily verified by checking the sharding status and
-seeing the chunks being rebalanced to the newly added node.
-
-			$/usr/bin/mongo localhost:8888/admin -u admin -p 123456
-			mongos> sh.status()
-				--- Sharding Status --- 
-  				sharding version: { "_id" : 1, "version" : 3 }
-  			shards:
-			{  "_id" : "bensible",  "host" : "bensible/bensible:20103,web2:20103,web3:20103" }
-			{  "_id" : "web2",  "host" : "web2/bensible:20105,web2:20105,web3:20105" }
-			{  "_id" : "web3",  "host" : "web3/bensible:20102,web2:20102,web3:20102" }
-			{  "_id" : "web4",  "host" : "web4/bensible:20101,web3:20101,web4:20101" }
-  			databases:
-			{  "_id" : "admin",  "partitioned" : false,  "primary" : "config" }
-			{  "_id" : "test",  "partitioned" : true,  "primary" : "bensible" }
-		
-			test.test_collection chunks:
-			
-				web4	3
-				web3	6
-				web2	6
-				bensible	5
     
 ###Serverspec.
 -----------------------------
@@ -295,6 +161,4 @@ $gem install ansible_spec
 $rake T
 rake serverspec:common
 rake serverspec:mongod
-rake serverspec:mongos
-rake serverspec:shards
 $rake serverspec:mongod
