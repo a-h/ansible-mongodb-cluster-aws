@@ -10,17 +10,3 @@
   hosts: mongo_servers
   roles:
   - role: mongod
-
-#- hosts: mongoc_servers
-#  roles:
-#  - role: mongoc
-
-- name: mongos
-  hosts: mongos_servers
-  roles:
-  - role: mongos
-
-- name: shards
-  hosts: mongo_servers
-  tasks:
-  - include: roles/mongod/tasks/shards.yml
