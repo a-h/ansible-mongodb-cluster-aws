@@ -160,6 +160,4 @@ Verify the servers using serverspec with ansible_spec
       $rake T
       rake serverspec:common
       rake serverspec:mongod
-      rake serverspec:mongos
-      rake serverspec:shards
       $rake serverspec:mongod
