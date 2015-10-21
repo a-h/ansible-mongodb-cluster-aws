@@ -15,12 +15,6 @@
 - name: create run directory for mongodb
   file: path=/var/run/mongo state=directory owner=mongod group=mongod
 
-# We need to start mongo without authentication or a keyfile enabled first,
-# otherwise it's not possible to configure the users, so the first version
-# of the configuration won't have authentication enabled.
-- name: Create the unauthenticated mongodb configuration file
-  template: src=mongod_unauthenticated.conf.j2 dest=/etc/mongod.conf
-
 # http://tom-chapman.uk/2012/12/28/installing-mongodb-on-a-linux-distro-using-systemd-instead-of-inittab/
 - name: Copy the systemd init file
   copy: src=mongod.service dest=/lib/systemd/system/mongod.service
@@ -31,6 +25,3 @@
 - name: Set up the mongodb service using systemd
   command: systemctl --system daemon-reload
   command: systemctl enable mongod.service
-
-- name: Enable at boot and start mongodb
-  service: name=mongod.service enabled=yes state=started

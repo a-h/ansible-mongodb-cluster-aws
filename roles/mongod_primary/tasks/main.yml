@@ -2,6 +2,12 @@
 # We need to start mongo without authentication or a keyfile enabled first,
 # otherwise it's not possible to configure the users, so the first version
 # of the configuration won't have authentication enabled.
+- name: Create the unauthenticated mongodb configuration file
+  template: src=mongod_unauthenticated.conf.j2 dest=/etc/mongod.conf
+
+- name: Enable at boot and start mongodb
+  service: name=mongod.service enabled=yes state=started
+
 - name: Create the file to initialize the replicaset
   template: src=repset_init.j2 dest=/tmp/repset_init.js
 
