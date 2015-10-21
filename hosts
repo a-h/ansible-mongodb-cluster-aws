@@ -1,6 +1,5 @@
-#The site wide list of mongodb servers
+# The site wide list of mongodb servers
 
-# the mongo servers need a mongod_port variable set, and they must not conflict.
 [mongo_servers]
 mongo1 mongod_port=27017
 mongo2 mongod_port=27017

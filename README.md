@@ -28,6 +28,7 @@ cluster and edit your hosts file to include your new servers, e.g.:
         10.0.0.102      mongo2
         10.0.0.103      mongo3
         10.0.0.104      mongo4
+        10.0.0.105      mongo4
 
 - If you decide to use some other virtual machines, update the name of the
 ethernet adaptor (iface variable) in the /group_vars/all file and ensure that
@@ -48,23 +49,27 @@ https://docs.mongodb.org/manual/tutorial/generate-key-file/
 
 The inventory file looks as follows:
 
-		#The site wide list of mongodb servers
-		[mongo_servers]
-		mongo1 mongod_port=27017
-		mongo2 mongod_port=27017
-		mongo3 mongod_port=27017
+    [mongo_servers]
+    mongo1 mongod_port=27017
+    mongo2 mongod_port=27017
+    mongo3 mongod_port=27017
+    mongo4 mongod_port=27017
+    mongo5 mongod_port=27017
+
+    [mongod_primary]
+    mongo1 mongod_port=27017
+
+    [mongod_slaves]
+    mongo2 mongod_port=27017
+    mongo3 mongod_port=27017
     mongo4 mongod_port=27017
 
-		#The list of servers where replication should happen, including the master server.
-		[replication_servers]
-    #mongo4 mongod_port=27017
-    mongo3
-		mongo1
-		mongo2
+    [mongod_arbiters]
+    mongo5
 
 Build the site with the following command:
 
-    ansible-playbook -i hosts site.yml -u root -k
+    ansible-playbook -i hosts 01_create_cluster.yml -u root -k
 
 #### Verifying the Deployment
 
@@ -76,94 +81,97 @@ availability by connecting to individual primary replication set nodes:
 When connected, issue the following commands to query the status of the
 replication set and you should get a similar output.
 
-        use admin
-
-        db.auth("admin", "123456")
-
-        rs.status()
-        {
-        	"set" : "mongo_replication",
-        	"date" : ISODate("2015-10-20T13:44:56.390Z"),
-        	"myState" : 1,
-        	"members" : [
-        		{
-        			"_id" : 0,
-        			"name" : "mongo1:27017",
-        			"health" : 1,
-        			"state" : 1,
-        			"stateStr" : "PRIMARY",
-        			"uptime" : 51,
-        			"optime" : Timestamp(1445267208, 2),
-        			"optimeDate" : ISODate("2015-10-19T15:06:48Z"),
-        			"electionTime" : Timestamp(1445348647, 1),
-        			"electionDate" : ISODate("2015-10-20T13:44:07Z"),
-        			"configVersion" : 1,
-        			"self" : true
-        		},
-        		{
-        			"_id" : 1,
-        			"name" : "mongo2:27017",
-        			"health" : 1,
-        			"state" : 2,
-        			"stateStr" : "SECONDARY",
-        			"uptime" : 34,
-        			"optime" : Timestamp(1445267208, 2),
-        			"optimeDate" : ISODate("2015-10-19T15:06:48Z"),
-        			"lastHeartbeat" : ISODate("2015-10-20T13:44:55.949Z"),
-        			"lastHeartbeatRecv" : ISODate("2015-10-20T13:44:54.658Z"),
-        			"pingMs" : 1,
-        			"configVersion" : 1
-        		},
-        		{
-        			"_id" : 2,
-        			"name" : "mongo3:27017",
-        			"health" : 1,
-        			"state" : 2,
-        			"stateStr" : "SECONDARY",
-        			"uptime" : 50,
-        			"optime" : Timestamp(1445267208, 2),
-        			"optimeDate" : ISODate("2015-10-19T15:06:48Z"),
-        			"lastHeartbeat" : ISODate("2015-10-20T13:44:55.933Z"),
-        			"lastHeartbeatRecv" : ISODate("2015-10-20T13:44:55.129Z"),
-        			"pingMs" : 0,
-        			"configVersion" : 1
-        		}
-        	],
-        	"ok" : 1
-        }
+    mongo_replication:PRIMARY> use admin
+    switched to db admin
+    mongo_replication:PRIMARY> db.auth("admin", "123456")
+    1
+    mongo_replication:PRIMARY> rs.status()
+    {
+    	"set" : "mongo_replication",
+    	"date" : ISODate("2015-10-21T19:43:54.932Z"),
+    	"myState" : 1,
+    	"members" : [
+    		{
+    			"_id" : 0,
+    			"name" : "mongo1:27017",
+    			"health" : 1,
+    			"state" : 1,
+    			"stateStr" : "PRIMARY",
+    			"uptime" : 100,
+    			"optime" : Timestamp(1445456545, 1),
+    			"optimeDate" : ISODate("2015-10-21T19:42:25Z"),
+    			"electionTime" : Timestamp(1445456537, 2),
+    			"electionDate" : ISODate("2015-10-21T19:42:17Z"),
+    			"configVersion" : 5,
+    			"self" : true
+    		},
+    		{
+    			"_id" : 1,
+    			"name" : "mongo2:27017",
+    			"health" : 1,
+    			"state" : 2,
+    			"stateStr" : "SECONDARY",
+    			"uptime" : 96,
+    			"optime" : Timestamp(1445456545, 1),
+    			"optimeDate" : ISODate("2015-10-21T19:42:25Z"),
+    			"lastHeartbeat" : ISODate("2015-10-21T19:43:53.716Z"),
+    			"lastHeartbeatRecv" : ISODate("2015-10-21T19:43:54.473Z"),
+    			"pingMs" : 1,
+    			"lastHeartbeatMessage" : "could not find member to sync from",
+    			"configVersion" : 5
+    		},
+    		{
+    			"_id" : 2,
+    			"name" : "mongo3:27017",
+    			"health" : 1,
+    			"state" : 2,
+    			"stateStr" : "SECONDARY",
+    			"uptime" : 94,
+    			"optime" : Timestamp(1445456545, 1),
+    			"optimeDate" : ISODate("2015-10-21T19:42:25Z"),
+    			"lastHeartbeat" : ISODate("2015-10-21T19:43:53.732Z"),
+    			"lastHeartbeatRecv" : ISODate("2015-10-21T19:43:54.906Z"),
+    			"pingMs" : 2,
+    			"lastHeartbeatMessage" : "could not find member to sync from",
+    			"configVersion" : 5
+    		},
+    		{
+    			"_id" : 3,
+    			"name" : "mongo4:27017",
+    			"health" : 1,
+    			"state" : 2,
+    			"stateStr" : "SECONDARY",
+    			"uptime" : 92,
+    			"optime" : Timestamp(1445456545, 1),
+    			"optimeDate" : ISODate("2015-10-21T19:42:25Z"),
+    			"lastHeartbeat" : ISODate("2015-10-21T19:43:53.732Z"),
+    			"lastHeartbeatRecv" : ISODate("2015-10-21T19:43:53.184Z"),
+    			"pingMs" : 3,
+    			"syncingTo" : "mongo3:27017",
+    			"configVersion" : 5
+    		},
+    		{
+    			"_id" : 4,
+    			"name" : "mongo5:27017",
+    			"health" : 1,
+    			"state" : 7,
+    			"stateStr" : "ARBITER",
+    			"uptime" : 89,
+    			"lastHeartbeat" : ISODate("2015-10-21T19:43:53.732Z"),
+    			"lastHeartbeatRecv" : ISODate("2015-10-21T19:43:53.840Z"),
+    			"pingMs" : 0,
+    			"configVersion" : 5
+    		}
+    	],
+    	"ok" : 1
+    }
 
 ### Scaling the Cluster
 ---------------------------------------
 
 To add a new node to the existing MongoDB Cluster, modify the inventory file
-to add a new server (mongo4):
-
-		#The site wide list of mongodb servers
-		[mongoservers]
-		mongo1 mongod_port=27017
-		mongo2 mongod_port=27017
-		mongo3 mongod_port=27017
-		mongo4 mongod_port=27017
-
-		#The list of servers where replication should happen, make sure the new node is listed here.
-		[replicationservers]
-		mongo4
-		mongo3
-		mongo1
-		mongo2
-
-Mongo will be installed, but the playbook will fail. After the first
-initialisation, new servers must be added manually after setup due to the
-security setup.
-
-To add the new server to the cluster, connect to the primary node in the
-MongoCluster and execute the following commands:
-
-    use admin
-    db.auth("admin", "123456")
-		rs.add({ "_id": 3, "host": "mongo4:27017"})
-
-You can then validate the server, by using the rs.status() command.
+to add a new server into the mongo_servers section and either the mongod_slaves
+or mongod_arbiters section.
 
 ###Verification
 
