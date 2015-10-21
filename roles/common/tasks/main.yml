@@ -26,6 +26,10 @@
    - mongodb-org-server
    - bc
    - python-pip
+   - ntp
+
+- name: Enable NTPD
+  service: name=ntpd enabled=yes state=started
 
 - name: Install the latest pymongo package
   pip: name=pymongo state=latest use_mirrors=no
