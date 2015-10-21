@@ -170,8 +170,13 @@ replication set and you should get a similar output.
 ---------------------------------------
 
 To add a new node to the existing MongoDB Cluster, modify the inventory file
-to add a new server into the mongo_servers section and either the mongod_slaves
-or mongod_arbiters section.
+(/hosts) to add a new server into the mongo_servers section and either the
+mongod_slaves or mongod_arbiters section.
+
+    ansible-playbook -i hosts 02_update_cluster.yml -u root -k
+
+A new server can be created by updating the Vagrant file, and calling "vagrant
+up", remember to update your /etc/hosts file to include the new server.
 
 ###Verification
 

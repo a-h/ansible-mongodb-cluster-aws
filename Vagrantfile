@@ -45,6 +45,13 @@ Vagrant.configure(2) do |config|
     server.vm.hostname = "mongo5"
   end
 
+  # config.vm.define "mongo_dc3_2" do |server|
+  #   server.vm.network :forwarded_port, host: 27027, guest: 27017
+  #   server.vm.network :forwarded_port, host: 27028, guest: 22
+  #   server.vm.network "private_network", ip: "10.0.0.106", :netmask => "255.255.0.0"
+  #   server.vm.hostname = "mongo6"
+  # end
+
   config.vm.provision :shell, inline: "systemctl enable firewalld"
   config.vm.provision :shell, inline: "systemctl start firewalld"
 
