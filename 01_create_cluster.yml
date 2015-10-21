@@ -11,7 +11,6 @@
   - role: mongod_base
 
 - name: Setup the Primary Node
-  creates: mongod_primary
   hosts: mongod_primary
   roles:
   - role: mongod_primary
