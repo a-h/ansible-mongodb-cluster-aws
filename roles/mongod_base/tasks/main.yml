@@ -2,12 +2,12 @@
 - name: Enable the mongod port.
   firewalld: port={{ mongod_port }}/tcp permanent=true state=enabled immediate=true
 
-#- name: Enable the port with the command line
-#  command: firewall-cmd --add-port={{ mongod_port }}/tcp
-
-# This role deploys the mongod processes and sets up the replication set.
-- name: create data directory for mongodb
+# This role deploys the mongod processes.
+- name: create data directory for mongodb data members
   file: path={{ mongodb_datadir_prefix }}/db state=directory owner=mongod group=mongod
+
+- name: create arbiter directory for mongodb arbiters
+  file: path={{ mongodb_datadir_prefix }}/arb state=directory owner=mongod group=mongod
 
 - name: create log directory for mongodb
   file: path=/var/log/mongodb state=directory owner=mongod group=mongod
@@ -34,24 +34,3 @@
 
 - name: Enable at boot and start mongodb
   service: name=mongod.service enabled=yes state=started
-
-# Setup the replica set
-- name: Create the file to initialize the mongod replica set
-  template: src=repset_init.j2 dest=/tmp/repset_init.js
-
-- name: Initialize the replication set
-  shell: /usr/bin/mongo --port "{{ mongod_port }}" /tmp/repset_init.js
-
-- name: Add the admin user to the replicaset
-  mongodb_user: database=admin name=admin password={{ mongo_admin_pass }} replica_set={{ replica_set_name }} login_port={{ mongod_port }} roles='root' state=present
-  ignore_errors: yes
-
-# Secure replication
-- name: Copy the keyfile for replicated authentication
-  copy: src=secret dest={{ mongodb_datadir_prefix }}secret owner=mongod group=mongod mode=0400
-
-- name: Create the authenticated mongodb configuration file
-  template: src=mongod.conf.j2 dest=/etc/mongod.conf
-
-- name: Restart mongodb
-  service: name=mongod.service enabled=yes state=restarted

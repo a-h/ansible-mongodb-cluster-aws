@@ -8,7 +8,7 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "bento/centos-7.1"
   config.ssh.insert_key = false
-    
+
   # Primary data centre
   config.vm.define "mongo_dc1_1" do |server|
     server.vm.network :forwarded_port, host: 27017, guest: 27017
@@ -29,6 +29,20 @@ Vagrant.configure(2) do |config|
     server.vm.network :forwarded_port, host: 27022, guest: 22
     server.vm.network "private_network", ip: "10.0.0.103", :netmask => "255.255.0.0"
     server.vm.hostname = "mongo3"
+  end
+
+  config.vm.define "mongo_dc2_2" do |server|
+    server.vm.network :forwarded_port, host: 27023, guest: 27017
+    server.vm.network :forwarded_port, host: 27024, guest: 22
+    server.vm.network "private_network", ip: "10.0.0.104", :netmask => "255.255.0.0"
+    server.vm.hostname = "mongo4"
+  end
+
+  config.vm.define "mongo_dc3_1" do |server|
+    server.vm.network :forwarded_port, host: 27025, guest: 27017
+    server.vm.network :forwarded_port, host: 27026, guest: 22
+    server.vm.network "private_network", ip: "10.0.0.105", :netmask => "255.255.0.0"
+    server.vm.hostname = "mongo5"
   end
 
   config.vm.provision :shell, inline: "systemctl enable firewalld"

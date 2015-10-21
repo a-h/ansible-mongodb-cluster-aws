@@ -1,0 +1,27 @@
+---
+# This Playbook would deploy the whole mongodb cluster with replication.
+- name: common
+  hosts: all
+  roles:
+  - role: common
+
+- name: Install MongoDB
+  hosts: mongo_servers
+  roles:
+  - role: mongod_base
+
+- name: Configure the replicaset security across all nodes
+  hosts: mongo_servers
+  roles:
+  - role: mongod_replicaset
+
+- name: Add the nodes to the cluster
+  hosts: mongod_slaves
+  serial: 1
+  roles:
+  - role: mongod_replicaset_slaves
+
+#- name: mongo_arbiters
+#  hosts: mongo_arbiters
+#  roles:
+#  - role: mongod_arbiter

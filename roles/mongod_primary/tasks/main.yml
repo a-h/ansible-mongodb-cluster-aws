@@ -1,0 +1,14 @@
+---
+# We need to start mongo without authentication or a keyfile enabled first,
+# otherwise it's not possible to configure the users, so the first version
+# of the configuration won't have authentication enabled.
+- name: Create the file to initialize the replicaset
+  template: src=repset_init.j2 dest=/tmp/repset_init.js
+
+- name: Add the admin user to the replicaset
+  mongodb_user: database=admin name=admin password={{ mongo_admin_pass }} login_port={{ mongod_port }} roles='root' state=present
+  ignore_errors: yes
+
+- name: Initialize the replication set on the primary
+  shell: /usr/bin/mongo -u admin -p {{ mongo_admin_pass }} --authenticationDatabase admin /tmp/repset_init.js
+  run_once: true
