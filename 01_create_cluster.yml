@@ -27,7 +27,8 @@
   roles:
   - role: mongod_replicaset_slaves
 
-#- name: mongo_arbiters
-#  hosts: mongo_arbiters
-#  roles:
-#  - role: mongod_arbiter
+- name: Add mongo arbiters to the cluster
+  hosts: mongod_arbiters
+  serial: 1
+  roles:
+  - role: mongod_replicaset_arbiters

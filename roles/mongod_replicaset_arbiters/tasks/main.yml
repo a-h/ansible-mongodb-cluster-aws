@@ -1,0 +1,8 @@
+---
+- name: Create the file to add the current node to the replica set
+  template: src=repset_init.j2 dest=/tmp/repset_init.js
+
+- name: Add arbiter to the replication set
+  shell: /usr/bin/mongo -u admin -p {{ mongo_admin_pass }} --authenticationDatabase admin -host {{ groups["mongod_primary"][0] }}:{{ hostvars[groups["mongod_primary"][0]]["mongod_port"] }} /tmp/repset_init.js
+  args:
+    creates: addArbiterNodeToReplicaset

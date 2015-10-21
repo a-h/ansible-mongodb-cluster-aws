@@ -16,5 +16,5 @@ mongo2 mongod_port=27017
 mongo3 mongod_port=27017
 mongo4 mongod_port=27017
 
-[mongo_arbiters]
-#mongo5
+[mongod_arbiters]
+mongo5

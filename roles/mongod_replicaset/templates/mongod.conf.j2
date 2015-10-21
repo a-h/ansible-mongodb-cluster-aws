@@ -13,9 +13,11 @@ systemLog:
 storage:
   dbPath: {{ mongodb_datadir_prefix }}db
   journal:
-    enabled: true
-#  engine:
-#  mmapv1:
+    enabled: {% if 'mongod_arbiters' in group_names %}false{% else %}true{% endif %} 
+{% if 'mongod_arbiters' in group_names %}
+  mmapv1:
+    smallFiles: true
+{% endif %}
 #  wiredTiger:
 
 # how the process runs
