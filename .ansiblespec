@@ -1,4 +1,8 @@
 --- 
 - 
-  playbook: site.yml
+  playbook: 01_create_cluster.yml
+  inventory: hosts
+
+- 
+  playbook: 02_update_cluster.yml
   inventory: hosts
