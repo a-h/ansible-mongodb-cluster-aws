@@ -19,10 +19,8 @@ host = ENV['TARGET_HOST']
 options = Net::SSH::Config.for(host)
 
 options[:user] ||= ENV['TARGET_USER']
-options[:user] ||= 'vagrant'
 options[:port] ||= ENV['TARGET_PORT']
 options[:keys] ||= ENV['TARGET_PRIVATE_KEY']
-options[:keys] ||= ['~/.vagrant.d/insecure_private_key']
 
 set :host,        options[:host_name] || host
 set :ssh_options, options
