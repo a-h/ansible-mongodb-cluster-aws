@@ -12,8 +12,11 @@
 - name: create log directory for mongodb
   file: path=/var/log/mongodb state=directory owner=mongod group=mongod
 
-- name: create run directory for mongodb
-  file: path=/var/run/mongo state=directory owner=mongod group=mongod
+- name: Create run directory for mongodb - Make sure that the run temp file directory gets created by systemd on reboot
+  copy: src=mongod_tempfiles.conf dest=/lib/tmpfiles.d/mongod_tempfiles.conf
+
+- name: Create run directory - do it now
+  command: systemd-tmpfiles --create mongod_tempfiles.conf
 
 # http://tom-chapman.uk/2012/12/28/installing-mongodb-on-a-linux-distro-using-systemd-instead-of-inittab/
 - name: Copy the systemd init file
@@ -25,3 +28,14 @@
 - name: Set up the mongodb service using systemd
   command: systemctl --system daemon-reload
   command: systemctl enable mongod.service
+
+# Use the blockdev command to set the readahead to 32 to increase performance
+- name: Set readahead on system startup
+  copy: src=setreadahead.service dest=/lib/systemd/system/setreadahead.service
+
+- name: Set up the blockdev script to run every time the system starts using systemd
+  command: systemctl --system daemon-reload
+  command: systemctl enable setreadahead.service
+
+- name: Run it
+  service: name=setreadahead.service enabled=yes state=restarted

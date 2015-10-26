@@ -1,0 +1,12 @@
+[Unit]
+Description=Set readahead
+After=syslog.target network.target
+Before=mongod.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sudo /usr/sbin/blockdev --setra 32 /dev/mapper/centos-root
+User=root
+
+[Install]
+WantedBy=multi-user.target
