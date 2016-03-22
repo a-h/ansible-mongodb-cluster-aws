@@ -22,8 +22,5 @@ mongodb_datadir_prefix: /data/
 # iface: '{{ ansible_default_ipv4.interface }}'
 iface: eth0
 
-# The password for admin user
-mongo_admin_pass: 123456
-
 # The name of the replication set
 replica_set_name: mongo_replication

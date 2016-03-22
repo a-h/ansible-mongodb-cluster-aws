@@ -4,6 +4,7 @@
 10.0.1.250 mongod_port=27017
 
 [mongod_primary]
+10.0.1.250 mongod_port=27017
 
 [mongod_slaves]
 
