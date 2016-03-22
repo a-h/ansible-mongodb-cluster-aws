@@ -34,12 +34,3 @@
 - name: Install the latest pymongo package
   pip: name=pymongo state=latest use_mirrors=no
 
-# Disable transparent_hugepages
-- name: Disable transparent_hugepages, create the profile directory for tuned (1/3)
-  file: path=/etc/tuned/no-thp state=directory
-
-- name: Copy the tuned.conf to the new directory (2/3)
-  copy: src=tuned.conf dest=/etc/tuned/no-thp
-
-- name: Enable the new profile
-  command: tuned-adm profile no-thp

@@ -1,23 +1,6 @@
-##Deploying a MongoDB cluster with Ansible
+## Setup MongoDB on Amazon
 
-- Tested with Ansible 1.9.4
-- Expects CentOS/RHEL 7 hosts
-
-### Data Replication
-
-![Alt text](images/replica_set.png "Replica Set")
-
-Data backup is achieved in MongoDB via _replica sets_. As the figure above shows,
-a single replication set consists of a replication master (active) and several
-other replications slaves (passive). All the database operations like
-add/delete/update happen on the replication master and the master replicates
-the data to the slave nodes. _mongod_ is the process which is responsible for all
-the database activities as well as replication processes. The minimum
-recommended number of slave servers are 3.
-
-### Deploying MongoDB Ansible
-
-#### Prerequisites
+### Prerequisites
 
 Edit the group_vars/all file to reflect the below variables.
 
@@ -34,7 +17,7 @@ cluster and edit your hosts file to include your new servers, e.g.:
 ethernet adaptor (iface variable) in the /group_vars/all file and ensure that
 ports 22 and 27017 are accessible.
 
-    enp0s8     # the interface to be used for all communication.
+    eth0     # the interface to be used for all communication.
 
 - The default directory for storing data is /data, please change it if
 required. Make sure it has sufficient space: 10G is recommended.

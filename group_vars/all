@@ -20,7 +20,7 @@ mongodb_datadir_prefix: /data/
 # ...to override.
 #
 # iface: '{{ ansible_default_ipv4.interface }}'
-iface: enp0s8
+iface: eth0
 
 # The password for admin user
 mongo_admin_pass: 123456

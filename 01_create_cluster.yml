@@ -2,32 +2,44 @@
 # This Playbook would deploy the whole mongodb cluster with replication.
 - name: common
   hosts: all
+  become: yes
+  become_method: sudo
   roles:
   - role: common
 
 - name: Install MongoDB
   hosts: mongo_servers
+  become: yes
+  become_method: sudo
   roles:
   - role: mongod_base
 
 - name: Setup the Primary Node
   hosts: mongod_primary
+  become: yes
+  become_method: sudo
   roles:
   - role: mongod_primary
 
 - name: Configure the replicaset security across all nodes
   hosts: mongo_servers
+  become: yes
+  become_method: sudo
   roles:
   - role: mongod_replicaset
 
 - name: Add the nodes to the cluster
   hosts: mongod_slaves
+  become: yes
+  become_method: sudo
   serial: 1
   roles:
   - role: mongod_replicaset_slaves
 
 - name: Add mongo arbiters to the cluster
   hosts: mongod_arbiters
+  become: yes
+  become_method: sudo
   serial: 1
   roles:
   - role: mongod_replicaset_arbiters

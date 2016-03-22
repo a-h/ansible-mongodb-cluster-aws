@@ -1,22 +1,10 @@
 # The site wide list of mongodb servers
 
 [mongo_servers]
-mongo1 mongod_port=27017
-mongo2 mongod_port=27017
-mongo3 mongod_port=27017
-mongo4 mongod_port=27017
-mongo5 mongod_port=27017
-# Remember to add the machine to your /etc/hosts file
-# mongo6 mongod_port=27017
+10.0.1.250 mongod_port=27017
 
 [mongod_primary]
-mongo1 mongod_port=27017
 
 [mongod_slaves]
-mongo2 mongod_port=27017
-mongo3 mongod_port=27017
-mongo4 mongod_port=27017
-# mongo6 mongod_port=27017
 
 [mongod_arbiters]
-mongo5 mongod_port=27017
