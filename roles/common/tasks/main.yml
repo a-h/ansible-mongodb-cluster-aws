@@ -3,6 +3,9 @@
 - name: Create the hosts file for all machines
   template: src=hosts.j2 dest=/etc/hosts
 
+- name: Add the MongoDB GPG key.
+  rpm_key: state=present key=https://www.mongodb.org/static/pgp/server-3.2.asc
+
 - name: Create the repository for 10Gen
   copy: src=10gen.repo.j2 dest=/etc/yum.repos.d/10gen.repo
 

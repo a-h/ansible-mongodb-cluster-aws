@@ -1,4 +1,4 @@
----
+
 # We need to start mongo without authentication or a keyfile enabled first,
 # otherwise it's not possible to configure the users, so the first version
 # of the configuration won't have authentication enabled.
@@ -6,7 +6,7 @@
   template: src=mongod_unauthenticated.conf.j2 dest=/etc/mongod.conf
 
 - name: Enable at boot and start mongodb
-  service: name=mongod.service enabled=yes state=started
+  service: name=mongod enabled=yes state=started
 
 - name: Add the admin user to the replicaset
   mongodb_user: database=admin name=admin password={{ mongo_admin_pass }} login_port={{ mongod_port }} roles='root' state=present
