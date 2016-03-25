@@ -24,3 +24,6 @@ iface: eth0
 
 # The name of the replication set
 replica_set_name: mongo_replication
+
+# Admin password
+mongo_admin_pass: 123456
