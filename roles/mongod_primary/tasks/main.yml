@@ -9,7 +9,7 @@
   service: name=mongod enabled=yes state=started
 
 - name: Add the admin user to the replicaset
-  mongodb_user: database=admin name=admin password={{ mongo_admin_pass }} login_port={{ mongod_port }} roles='root' state=present
+  mongodb_user: database=admin name=admin password="{{ mongo_admin_pass }}" login_port="{{ mongod_port }}" roles='root' state=present
   ignore_errors: yes
 
 - name: Create the file to initialize the replicaset
