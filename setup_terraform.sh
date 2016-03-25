@@ -9,3 +9,8 @@ rm terraform_0.6.14_linux_amd64.zip
 sudo yum install -y python-setuptools
 sudo easy_install pip
 sudo pip install awscli
+# Ensure that the clock is set properly.
+# Sync the time
+yum install -y chrony
+sudo systemctl enable chronyd
+sudo systemctl start chronyd

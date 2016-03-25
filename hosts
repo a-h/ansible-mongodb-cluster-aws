@@ -2,6 +2,8 @@
 
 [mongo_servers]
 10.0.1.250 mongod_port=27017
+10.0.2.250 mongod_port=27017
+10.0.3.250 mongod_port=27017
 
 [mongod_primary]
 10.0.1.250 mongod_port=27017
