@@ -1,2 +1,4 @@
 /.vagrant
-private_key.pem
+*.pem
+credentials.csv
+terraform.tfstate*
