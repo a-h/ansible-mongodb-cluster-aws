@@ -9,15 +9,15 @@
   service: name=mongod enabled=yes state=started
 
 - name: Create the file to create the admin user
-  template: src=create_user.j2 localhost:{{ mongod_port }}/admin dest=/tmp/create_user.js
+  template: src=create_user.j2 dest=/tmp/create_user.js
 
 - name: Create the admin user
-  shell: /usr/bin/mongo /tmp/create_user.js
+  shell: /usr/bin/mongo localhost:{{ mongod_port }}/admin /tmp/create_user.js
   run_once: true
 
 - name: Create the file to initialize the replicaset
   template: src=repset_init.j2 dest=/tmp/repset_init.js
 
 - name: Initialize the replication set on the primary
-  shell: /usr/bin/mongo -u admin -p {{ mongo_admin_pass }} --authenticationDatabase admin /tmp/repset_init.js
+  shell: /usr/bin/mongo localhost:{{ mongod_port }}/admin -u admin -p {{ mongo_admin_pass }} /tmp/repset_init.js
   run_once: true

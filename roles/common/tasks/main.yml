@@ -1,8 +1,5 @@
 ---
 # This Playbook runs all the common plays in the deployment
-- name: Create the hosts file for all machines
-  template: src=hosts.j2 dest=/etc/hosts
-
 - name: Add the MongoDB GPG key.
   rpm_key: state=present key=https://www.mongodb.org/static/pgp/server-3.2.asc
 
@@ -29,4 +26,3 @@
 
 - name: Install the latest pymongo package
   pip: name=pymongo state=latest use_mirrors=no
-
