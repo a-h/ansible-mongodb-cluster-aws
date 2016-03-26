@@ -2,13 +2,12 @@
 # Secure replication using the secret
 - name: Copy the keyfile for replicated authentication
   copy: src=secret dest={{ mongodb_datadir_prefix }}secret owner=mongod group=mongod mode=0400
-  notify:
-    - Restart mongodb
 
 - name: Create the authenticated mongodb configuration file
   template: src=mongod.conf.j2 dest=/etc/mongod.conf
-  notify:
-    - Restart mongodb
+
+- name: Restart mongodb
+  service: name=mongod enabled=yes state=restarted
 
 - name: Create the file to initialize the replicaset
   template: src=repset_init.j2 dest=/tmp/repset_init.js

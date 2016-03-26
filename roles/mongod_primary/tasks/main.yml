@@ -14,3 +14,4 @@
 - name: Create the admin user
   shell: /usr/bin/mongo localhost:{{ mongod_port }}/admin /tmp/create_user.js
   run_once: true
+  ignore_errors: true
