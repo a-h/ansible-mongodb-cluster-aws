@@ -1,2 +1,2 @@
-rs.initiate();
+rs.initiate({ members: [ { host: "{{ ansible_eth0.ipv4.address }}" ]});
 printjson(rs.status());

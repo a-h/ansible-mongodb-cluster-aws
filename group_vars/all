@@ -13,15 +13,8 @@ mongoc_port: 7777
 # The directory prefix where the database files would be stored
 mongodb_datadir_prefix: /data/
 
-# The interface where the mongodb process should listen on.
-# Defaults to the first interface. Change this to:
-#
-#  iface: eth1
-#
-# ...to override.
-#
-# iface: '{{ ansible_default_ipv4.interface }}'
-iface: eth0
+# The standard port.
+mongod_port: 27017
 
 # The name of the replication set
 replica_set_name: mongo_replication

@@ -1,2 +1,2 @@
-rs.addArb("{{ ansible_hostname }}:{{ mongod_port }}");
+rs.addArb("{{ ansible_eth0.ipv4.address }}:{{ mongod_port }}");
 printjson(rs.status());

@@ -13,12 +13,6 @@ cluster and edit your hosts file to include your new servers, e.g.:
         10.0.0.104      mongo4
         10.0.0.105      mongo4
 
-- If you decide to use some other virtual machines, update the name of the
-ethernet adaptor (iface variable) in the /group_vars/all file and ensure that
-ports 22 and 27017 are accessible.
-
-    eth0     # the interface to be used for all communication.
-
 - The default directory for storing data is /data, please change it if
 required. Make sure it has sufficient space: 10G is recommended.
 
