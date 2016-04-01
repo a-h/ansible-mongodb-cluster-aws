@@ -57,6 +57,13 @@ resource "aws_security_group" "svc_incoming_web" {
 
   # Allow HTTP traffic from everywhere.
   ingress {
+      from_port = 8080
+      to_port = 8080
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
       from_port = 80
       to_port = 80
       protocol = "tcp"
@@ -172,6 +179,7 @@ resource "aws_instance" "web1" {
     tags {
       Name = "web1"
     }
+    private_ip = "10.0.129.128"
     user_data = "${file("run_app.sh")}"
 }
 
@@ -185,6 +193,7 @@ resource "aws_instance" "web2" {
     tags {
       Name = "web2"
     }
+    private_ip = "10.0.130.128"
     user_data = "${file("run_app.sh")}"
 }
 
@@ -198,6 +207,7 @@ resource "aws_instance" "web3" {
     tags {
       Name = "web3"
     }
+    private_ip = "10.0.131.128"
     user_data = "${file("run_app.sh")}"
 }
 
@@ -276,7 +286,7 @@ resource "aws_elb" "svc_elb" {
   security_groups = [ "${aws_security_group.svc_incoming_web.id}" ]
 
   listener {
-    instance_port = 80
+    instance_port = 8080
     instance_protocol = "http"
     lb_port = 80
     lb_protocol = "http"
@@ -286,8 +296,8 @@ resource "aws_elb" "svc_elb" {
     healthy_threshold = 2
     unhealthy_threshold = 8
     timeout = 3
-    target = "HTTP:80/"
-    interval = 30
+    target = "HTTP:8080/establishment/"
+    interval = 10
   }
 
   instances = [ "${aws_instance.web1.id}", "${aws_instance.web2.id}", "${aws_instance.web3.id}"]
@@ -317,7 +327,7 @@ resource "aws_security_group" "svc_mongo_access" {
         cidr_blocks = ["10.0.0.0/16"]
     }
 
-    # Allow SSH from the Web Servers.
+    # Allow SSH from the bastion server.
     ingress {
         from_port = 22
         to_port = 22
