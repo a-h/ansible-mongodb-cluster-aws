@@ -1,7 +1,4 @@
 ---
-- name: Create the file to initiate the replica set
-  template: src=repset_init.j2 dest=/tmp/repset_init.js
-
 - name: Create the file to add the current node to the replica set as an arbiter
   template: src=repset_addArbiter.j2 dest=/tmp/repset_addArbiter.js
 
